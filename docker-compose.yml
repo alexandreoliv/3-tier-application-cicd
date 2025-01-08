@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:17.2
+    container_name: db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: basic3tier
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - basic3tier-net
+
+  backend:
+    container_name: backend
+    image: alexandrebo/backend:latest
+    ports:
+      - "7000:80"
+    depends_on:
+      - db        
+    environment:
+      ConnectionStrings__Basic3Tier: "Host=db;Port=5432;Database=basic3tier;Username=postgres;Password=admin123"
+    networks:
+      - basic3tier-net
+
+  frontend:
+    container_name: frontend
+    image: alexandrebo/frontend:latest
+    ports:
+      - "5000:80"
+    depends_on:
+      - backend
+      - db
+    networks:
+      - basic3tier-net
+    volumes:
+      - ./ui/configs:/usr/share/nginx/html/configs:ro
+
+networks:
+  basic3tier-net:
+    name: basic3tier-net
+    driver: bridge
+
+volumes:
+  postgres_data:
