@@ -53,24 +53,25 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    # Set up SSH to EC2
-    - name: Set up SSH
-      uses: appleboy/ssh-action@v0.1.1
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USERNAME }}
-        key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+    # # Set up SSH to EC2
+    # - name: Set up SSH
+    #   uses: appleboy/ssh-action@v0.1.1
+    #   with:
+    #     host: ${{ secrets.EC2_HOST }}
+    #     username: ${{ secrets.EC2_USERNAME }}
+    #     key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
 
     # Save the private key and use it for SCP
     - name: Save SSH private key
       run: |
+        mkdir -p ~/.ssh
         echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 400 ~/.ssh/id_rsa
 
     # Ensure Docker is installed on the EC2 machine
     - name: Ensure Docker is installed on EC2
       run: |
-        ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << 'EOF'
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << 'EOF'
           # Check if Docker is installed, if not, install it
           docker -v || (sudo apt-get update -y && sudo apt-get install -y docker.io && sudo systemctl start docker && sudo systemctl enable docker)
 
@@ -81,12 +82,12 @@ jobs:
     # Transfer docker-compose.yml to EC2
     - name: Copy docker-compose.yml to EC2
       run: |
-        scp -i ~/.ssh/id_rsa docker-compose.yml ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USERNAME }}/docker-compose.yml
+        scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa docker-compose.yml ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USERNAME }}/docker-compose.yml
 
      # Run Docker Compose on EC2 to pull and start the containers
     - name: Run Docker Compose on EC2
       run: |
-        ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << 'EOF'
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << 'EOF'
           cd /home/${{ secrets.EC2_USERNAME }}
-          docker-compose up -d
+          sudo docker-compose up -d
         EOF
