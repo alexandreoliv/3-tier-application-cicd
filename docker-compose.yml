@@ -15,7 +15,7 @@ services:
 
   backend:
     container_name: backend
-    image: alexandrebo/backend:latest
+    image: alexandrebo/3-tier-application-backend:latest
     ports:
       - "7000:80"
     depends_on:
@@ -27,7 +27,7 @@ services:
 
   frontend:
     container_name: frontend
-    image: alexandrebo/frontend:latest
+    image: alexandrebo/3-tier-application-frontend:latest
     ports:
       - "5000:80"
     depends_on:

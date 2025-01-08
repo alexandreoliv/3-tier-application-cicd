@@ -27,21 +27,21 @@ jobs:
     # Build the backend image
     - name: Build backend image
       run: |
-        docker build -f api/Dockerfile -t alexandrebo/backend:latest ./api
+        docker build -f api/Dockerfile -t alexandrebo/3-tier-application-backend:latest ./api
 
     # Build the frontend image
     - name: Build frontend image
       run: |
-        docker build -f ui/Dockerfile -t alexandrebo/frontend:latest ./ui
+        docker build -f ui/Dockerfile -t alexandrebo/3-tier-application-frontend:latest ./ui
 
     # Push the images to DockerHub
     - name: Push backend image to DockerHub
       run: |
-        docker push alexandrebo/backend:latest
+        docker push alexandrebo/3-tier-application-backend:latest
 
     - name: Push frontend image to DockerHub
       run: |
-        docker push alexandrebo/frontend:latest
+        docker push alexandrebo/3-tier-application-frontend:latest
 
          # Continuous Delivery job
   
