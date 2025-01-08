@@ -34,3 +34,8 @@ coverage/
 *.bak
 *.swp
 *~
+
+# Ignore some Terraform files
+.terraform
+terraform.tfstate
+terraform.tfstate.backup
